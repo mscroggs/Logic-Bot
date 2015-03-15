@@ -86,8 +86,9 @@ while i<43**141:
             assignment = base_convert(j,2)
             while len(assignment)<len(num_order):
                 assignment = [0]+assignment
+            test = formula
             for k,val in enumerate(assignment):
-                test = str(val).join(formula.split(variables[k]))
+                test = str(val).join(test.split(variables[k]))
             oldtest = "Z"
             while oldtest != test:
                 oldtest = test
