@@ -19,16 +19,20 @@ class Symbols:
         for v in self.variables:
             self.after[v] = [")"]+self.binary
         for b in self.binary:
-            self.after[b] = self.unary+self.variables_dummy
+            self.after[b] = ["("]+self.unary+self.variables_dummy
         for u in self.unary:
-            self.after[u] = self.unary+self.variables_dummy
+            self.after[u] = ["("]+self.unary+self.variables_dummy
         self.after["("] = ["("]+self.unary+self.variables_dummy
         self.after[")"] = [")"]+self.binary
         
         for a in self.after:
             self.backw[a]={}
             for i,b in enumerate(self.after[a]):
-                self.backw[a][b] = i
+                if b=="a":
+                    for j,v in enumerate(self.variables):
+                        self.backw[a][v]=i+j
+                else:
+                    self.backw[a][b] = i
 
 class Formula:
     def __init__(self):
@@ -52,10 +56,14 @@ class Formula:
             self.back += [self.S.back_first]
         i-=1
         while i>=0:
-            self.choice[i] = self.S.after[self[i+1]]# or -i-2
+            self.choice[i] = self.S.after[self[i+1]][:]# or -i-2
             self.back[i] = self.S.backw[self[i+1]]
             if "a" in self.choice[i]:
-                pass
+                vari=0
+                for j in range(i+1,len(self.current)):
+                    if self.S.variables[vari] == self[j]:
+                        self.choice[i].append(self.S.variables[vari+1])
+                        vari+=1
             # update back and choice
             i-=1
 
@@ -67,6 +75,14 @@ class Formula:
 
     def __getitem__(self,i):
         return self.choice[i][self.current[i]]
+
+def base_convert(n_10,base):
+    if n_10<base:
+        return [int(n_10)]
+    digit = n_10 % base
+    n_10 -= digit
+    n_10 /= base
+    return base_convert(n_10,base)+[int(digit)]
 
 def logic_iterate(test):
     test = "1".join(test.split("-0"))
@@ -120,7 +136,7 @@ while True:
         assignment = [0]*(len(current)-len(assignment))+assignment
         test = current
         for k,val in enumerate(assignment):
-            test = str(val).join(test.split(variables[k]))
+            test = str(val).join(test.split(formula.S.variables[k]))
         oldtest = "Z"
         while oldtest != test:
             oldtest = test
@@ -133,3 +149,4 @@ while True:
         with open("tautologies","a") as f:
             f.write(current+"\n")
         print(current)
+    formula.next()
