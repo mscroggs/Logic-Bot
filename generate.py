@@ -3,11 +3,11 @@ from time import time
 
 def base_convert(n_10,base):
     if n_10<base:
-        return [n_10]
+        return [int(n_10)]
     digit = n_10 % base
     n_10 -= digit
     n_10 /= base
-    return base_convert(n_10,base)+[digit]
+    return base_convert(n_10,base)+[int(digit)]
 
 def in_order(list):
     if len(list)>0:
@@ -72,14 +72,6 @@ while i<43**141:
         formula += charray[num]
         if num>=7 and num not in num_order:
             num_order.append(num)
-    if i>next_print:
-        next_print=i+10**7
-        time_taken = time()-start
-        proportion_done = float(i)/43**141
-        if proportion_done == 0: proportion_done = 1
-        time_to_finish = (time_taken/proportion_done)
-        years = floor(time_to_finish/60/60/24/365.25)
-        print "%s years to complete" % years
     if in_order(num_order):
         tautology = True
         for j in range(0,2**len(num_order)):
@@ -98,9 +90,14 @@ while i<43**141:
                 break
         if tautology:
             found += 1
+            formula=formula.replace('-',u'\u00AC')
+            formula=formula.replace('>',u'\u21FE')
+            formula=formula.replace('=',u'\u21FF')
+            formula=formula.replace('^',u'\u2227')
+            formula=formula.replace('/',u'\u2228')
             with open("tautologies","a") as f:
-                f.write(formula+"""
-""")
+                f.write(formula+"\n")
+            print(formula)
     added = False
     for j,character in enumerate(conv):
         if (character>(j-1)/3+7 or 
