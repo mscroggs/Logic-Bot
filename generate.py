@@ -44,7 +44,13 @@ def logic_iterate(test):
     return test
 
 with open("tautologies","w") as f:
-    pass
+    f.write("# KEY\n")
+    f.write("# - not\n")
+    f.write("# + and\n")
+    f.write("# / or\n")
+    f.write("# > implies\n")
+    f.write("# = if and only if \n")
+    f.write("# a-z and A-J represent variables \n")
 with open("sequence","w") as f:
     pass
 
@@ -90,11 +96,11 @@ while i<43**141:
                 break
         if tautology:
             found += 1
-            formula=formula.replace('-',u'\u00AC')
-            formula=formula.replace('>',u'\u21FE')
-            formula=formula.replace('=',u'\u21FF')
-            formula=formula.replace('^',u'\u2227')
-            formula=formula.replace('/',u'\u2228')
+            #formula=formula.replace('-',u'\u00AC')
+            #formula=formula.replace('>',u'\u21FE')
+            #formula=formula.replace('=',u'\u21FF')
+            #formula=formula.replace('+',u'\u2227')
+            #formula=formula.replace('/',u'\u2228')
             with open("tautologies","a") as f:
                 f.write(formula+"\n")
             print(formula)
