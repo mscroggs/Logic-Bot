@@ -1,3 +1,10 @@
+from string import ascii_lowercase
+greek_lowercase = [u'\u03B1',u'\u03B2',u'\u03B3',u'\u03B4',u'\u03B5',u'\u03B6',
+                   u'\u03B7',u'\u03B8',u'\u03B9',u'\u03BA',u'\u03BB',u'\u03BC',
+                   u'\u03BD',u'\u03BE',u'\u03BF',u'\u03C0',u'\u03C1',u'\u03C3',
+                   u'\u03C4',u'\u03C5',u'\u03C6',u'\u03C7',u'\u03C8',u'\u03C9']
+letters =  [i for i in ascii_lowercase] + greek_lowercase
+
 class Formula:
     def __init__(self, current=[0]):
         self.list = current
@@ -109,7 +116,6 @@ class Symbol:
         self.n = n
 
     def as_ascii(self):
-        from string import ascii_letters
         if self.n==0: return "-"
         if self.n==1: return "^"
         if self.n==2: return "v"
@@ -117,10 +123,9 @@ class Symbol:
         if self.n==4: return ">"
         if self.n==5: return "("
         if self.n==6: return ")"
-        return ascii_letters[self.letter_n()]
+        return letters[self.letter_n()]
 
     def as_unicode(self):
-        from string import ascii_letters
         if self.n==0: return u"\u00AC"
         if self.n==1: return u"\u2227"
         if self.n==2: return u"\u2228"
@@ -128,7 +133,7 @@ class Symbol:
         if self.n==4: return u"\u21FE"
         if self.n==5: return "("
         if self.n==6: return ")"
-        return ascii_letters[self.letter_n()]
+        return letters[self.letter_n()]
 
     def as_machine(self, true):
         if self.n==0: return "NOT"
