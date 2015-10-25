@@ -83,13 +83,10 @@ class Formula:
         return max_l
 
     def is_tautology(self):
-        print self
         from itertools import product
         for true in product([0,1],repeat=self.highest_letter()+1):
             if not self.get_truth(true):
-                print "NOT T"
                 return False
-        print "T"
         return True
 
     def as_ascii(self):
