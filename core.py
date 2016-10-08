@@ -187,6 +187,8 @@ class Symbol:
         if self.n==4: return ([Symbol(i,self.n) for i in [0,5]],True)
         if self.n==5: return ([Symbol(i,self.n) for i in [0,5]],True)
         if self.n==6: return ([Symbol(i,self.n) for i in [1,2,3,4,6]],False)
+        if self.prev==5:
+            return ([Symbol(i,self.n) for i in [1,2,3,4]],False)
         if self.prev in [1,2,3,4]:
             return ([Symbol(6,self.n)],False)
         return ([Symbol(i,self.n) for i in [1,2,3,4,6]],False)
