@@ -9,27 +9,12 @@ class Formula:
     def __init__(self, current=[0]):
         self.list = current
 
-    def sub_invalid(self,n):
-        asc = self.as_ascii()
-        s = asc[:n]
-        s = s.split("(")[-1]
-        s = s.split(")")[-1]
-        if asc[n] not in ["^","v","=",">"]:
-            return False
-        for c in ["^","v","=",">"]:
-            if c in s:
-                return True
-        return False
-
     def next(self):
         n = len(self.list)-1
         self.list[n] += 1
         while True:
             try:
                 self.get_symbol_lists()[n][self.list[n]]
-                while self.sub_invalid(n):
-                    self.list[n] += 1
-                    self.get_symbol_lists()[n][self.list[n]]
                 break
             except IndexError:
                 self.list[n] = 0
@@ -47,7 +32,7 @@ class Formula:
             sym = output[i][n]
             afters,letter_next = sym.after()
             if letter_next:
-                afters += [Symbol(j+7) for j in range(ok_letters+2)]
+                afters += [Symbol(j+7,afters[0].prev) for j in range(ok_letters+2)]
             if sym.is_letter():
                 ok_letters = max(ok_letters,sym.letter_n())
             output.append(afters)
@@ -123,6 +108,15 @@ class Formula:
                 return False
         return True
 
+    def is_contradiction(self):
+        from itertools import product
+        if not self.brackets_match():
+            return False
+        for true in product([0,1],repeat=self.highest_letter()+1):
+            if self.get_truth(true):
+                return False
+        return True
+
     def as_ascii(self):
         output=""
         for i,n in enumerate(self.list):
@@ -142,8 +136,9 @@ class Formula:
         return len(self.list)
 
 class Symbol:
-    def __init__(self,n):
+    def __init__(self, n, prev=None):
         self.n = n
+        self.prev = prev
 
     def as_ascii(self):
         if self.n==0: return "-"
@@ -176,14 +171,16 @@ class Symbol:
         return str(true[self.letter_n()])
 
     def after(self):
-        if self.n==0: return ([Symbol(i) for i in [0,5]],True)
-        if self.n==1: return ([Symbol(i) for i in [0,5]],True)
-        if self.n==2: return ([Symbol(i) for i in [0,5]],True)
-        if self.n==3: return ([Symbol(i) for i in [0,5]],True)
-        if self.n==4: return ([Symbol(i) for i in [0,5]],True)
-        if self.n==5: return ([Symbol(i) for i in [0,5]],True)
-        if self.n==6: return ([Symbol(i) for i in [1,2,3,4,6]],False)
-        return ([Symbol(i) for i in [1,2,3,4,6]],False)
+        if self.n==0: return ([Symbol(i,self.n) for i in [0,5]],True)
+        if self.n==1: return ([Symbol(i,self.n) for i in [0,5]],True)
+        if self.n==2: return ([Symbol(i,self.n) for i in [0,5]],True)
+        if self.n==3: return ([Symbol(i,self.n) for i in [0,5]],True)
+        if self.n==4: return ([Symbol(i,self.n) for i in [0,5]],True)
+        if self.n==5: return ([Symbol(i,self.n) for i in [0,5]],True)
+        if self.n==6: return ([Symbol(i,self.n) for i in [1,2,3,4,6]],False)
+        if self.prev in [1,2,3,4]:
+            return ([Symbol(6,self.n)],False)
+        return ([Symbol(i,self.n) for i in [1,2,3,4,6]],False)
 
     def is_letter(self):
         if self.n>6:
