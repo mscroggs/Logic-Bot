@@ -9,7 +9,7 @@ seq = []
 
 try:
     while True:
-        if f.is_tautology():
+        if f.is_contradiction():
             count += 1
             print(f)
             if len(sys.argv)>=2:

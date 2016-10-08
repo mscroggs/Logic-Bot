@@ -5,6 +5,9 @@ greek_lowercase = [u'\u03B1',u'\u03B2',u'\u03B3',u'\u03B4',u'\u03B5',u'\u03B6',
                    u'\u03C4',u'\u03C5',u'\u03C6',u'\u03C7',u'\u03C8',u'\u03C9']
 letters =  [i for i in ascii_lowercase] + greek_lowercase
 
+class InvalidFormula(BaseException):
+    pass
+
 class Formula:
     def __init__(self, current=[0]):
         self.list = current
@@ -89,7 +92,7 @@ class Formula:
             return True
         if mach == "0":
             return False
-        return None
+        raise InvalidFormula
 
     def highest_letter(self):
         max_l = -1
@@ -104,7 +107,10 @@ class Formula:
         if not self.brackets_match():
             return False
         for true in product([0,1],repeat=self.highest_letter()+1):
-            if not self.get_truth(true):
+            try:
+                if not self.get_truth(true):
+                    return False
+            except InvalidFormula:
                 return False
         return True
 
@@ -113,7 +119,10 @@ class Formula:
         if not self.brackets_match():
             return False
         for true in product([0,1],repeat=self.highest_letter()+1):
-            if self.get_truth(true):
+            try:
+                if self.get_truth(true):
+                    return False
+            except InvalidFormula:
                 return False
         return True
 
