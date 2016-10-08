@@ -1,6 +1,25 @@
+from string import ascii_lowercase
+greek_lowercase = [u'\u03B1',u'\u03B2',u'\u03B3',u'\u03B4',u'\u03B5',u'\u03B6',
+                   u'\u03B7',u'\u03B8',u'\u03B9',u'\u03BA',u'\u03BB',u'\u03BC',
+                   u'\u03BD',u'\u03BE',u'\u03BF',u'\u03C0',u'\u03C1',u'\u03C3',
+                   u'\u03C4',u'\u03C5',u'\u03C6',u'\u03C7',u'\u03C8',u'\u03C9']
+letters =  [i for i in ascii_lowercase] + greek_lowercase
+
 class Formula:
     def __init__(self, current=[0]):
         self.list = current
+
+    def sub_invalid(self,n):
+        asc = self.as_ascii()
+        s = asc[:n]
+        s = s.split("(")[-1]
+        s = s.split(")")[-1]
+        if asc[n] not in ["^","v","=",">"]:
+            return False
+        for c in ["^","v","=",">"]:
+            if c in s:
+                return True
+        return False
 
     def next(self):
         n = len(self.list)-1
@@ -8,6 +27,9 @@ class Formula:
         while True:
             try:
                 self.get_symbol_lists()[n][self.list[n]]
+                while self.sub_invalid(n):
+                    self.list[n] += 1
+                    self.get_symbol_lists()[n][self.list[n]]
                 break
             except IndexError:
                 self.list[n] = 0
@@ -37,6 +59,16 @@ class Formula:
         for i,n in enumerate(self.list):
             mach += sls[i][n].as_machine(true)
         return mach
+
+    def brackets_match(self):
+        o = 0
+        c = 0
+        for i in self.as_ascii():
+            if i == ")":
+                o += 1
+            if i == "(":
+                c += 1
+        return o==c
 
     def get_truth(self, true):
         old_mach = "z"
@@ -84,6 +116,8 @@ class Formula:
 
     def is_tautology(self):
         from itertools import product
+        if not self.brackets_match():
+            return False
         for true in product([0,1],repeat=self.highest_letter()+1):
             if not self.get_truth(true):
                 return False
@@ -104,12 +138,14 @@ class Formula:
     def __str__(self):
         return self.as_ascii()
 
+    def __len__(self):
+        return len(self.list)
+
 class Symbol:
     def __init__(self,n):
         self.n = n
 
     def as_ascii(self):
-        from string import ascii_letters
         if self.n==0: return "-"
         if self.n==1: return "^"
         if self.n==2: return "v"
@@ -117,10 +153,9 @@ class Symbol:
         if self.n==4: return ">"
         if self.n==5: return "("
         if self.n==6: return ")"
-        return ascii_letters[self.letter_n()]
+        return letters[self.letter_n()]
 
     def as_unicode(self):
-        from string import ascii_letters
         if self.n==0: return u"\u00AC"
         if self.n==1: return u"\u2227"
         if self.n==2: return u"\u2228"
@@ -128,7 +163,7 @@ class Symbol:
         if self.n==4: return u"\u21FE"
         if self.n==5: return "("
         if self.n==6: return ")"
-        return ascii_letters[self.letter_n()]
+        return letters[self.letter_n()]
 
     def as_machine(self, true):
         if self.n==0: return "NOT"
@@ -141,7 +176,7 @@ class Symbol:
         return str(true[self.letter_n()])
 
     def after(self):
-        if self.n==0: return ([Symbol(i) for i in [0,5,6]],True)
+        if self.n==0: return ([Symbol(i) for i in [0,5]],True)
         if self.n==1: return ([Symbol(i) for i in [0,5]],True)
         if self.n==2: return ([Symbol(i) for i in [0,5]],True)
         if self.n==3: return ([Symbol(i) for i in [0,5]],True)
