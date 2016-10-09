@@ -210,11 +210,13 @@ class Symbol:
         while n is not None and n.n == 0:
             n = n.prev
         if n is not None:
-            if n.n==5:
+            if n.n == 5:
                 return ([Symbol(i,self) for i in [1,2,3,4]],False)
             if n.n in [1,2,3,4]:
                 return ([Symbol(6,self)],False)
-        return ([Symbol(i,self) for i in [1,2,3,4,6]],False)
+            if n.n == 6:
+                return ([Symbol(i,self) for i in [1,2,3,4,6]],False)
+        return ([Symbol(6,self)],False)
 
     def is_letter(self):
         if self.n>6:
