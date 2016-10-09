@@ -199,7 +199,7 @@ class Symbol:
         return str(true[self.letter_n()])
 
     def after(self):
-        n = self.prev
+        n = self
         if n is not None:
             bracount = 0
             found = False
