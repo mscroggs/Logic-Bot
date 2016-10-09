@@ -180,18 +180,22 @@ class Symbol:
         return str(true[self.letter_n()])
 
     def after(self):
-        if self.n==0: return ([Symbol(i,self.n) for i in [0,5]],True)
-        if self.n==1: return ([Symbol(i,self.n) for i in [0,5]],True)
-        if self.n==2: return ([Symbol(i,self.n) for i in [0,5]],True)
-        if self.n==3: return ([Symbol(i,self.n) for i in [0,5]],True)
-        if self.n==4: return ([Symbol(i,self.n) for i in [0,5]],True)
-        if self.n==5: return ([Symbol(i,self.n) for i in [0,5]],True)
-        if self.n==6: return ([Symbol(i,self.n) for i in [1,2,3,4,6]],False)
-        if self.prev==5:
-            return ([Symbol(i,self.n) for i in [1,2,3,4]],False)
-        if self.prev in [1,2,3,4]:
-            return ([Symbol(6,self.n)],False)
-        return ([Symbol(i,self.n) for i in [1,2,3,4,6]],False)
+        if self.n==0: return ([Symbol(i,self) for i in [0,5]],True)
+        if self.n==1: return ([Symbol(i,self) for i in [0,5]],True)
+        if self.n==2: return ([Symbol(i,self) for i in [0,5]],True)
+        if self.n==3: return ([Symbol(i,self) for i in [0,5]],True)
+        if self.n==4: return ([Symbol(i,self) for i in [0,5]],True)
+        if self.n==5: return ([Symbol(i,self) for i in [0,5]],True)
+        if self.n==6: return ([Symbol(i,self) for i in [1,2,3,4,6]],False)
+        n = self.prev
+        while n is not None and n.n == 0:
+            n = n.prev
+        if n is not None:
+            if n.n==5:
+                return ([Symbol(i,self) for i in [1,2,3,4]],False)
+            if n.n in [1,2,3,4]:
+                return ([Symbol(6,self)],False)
+        return ([Symbol(i,self) for i in [1,2,3,4,6]],False)
 
     def is_letter(self):
         if self.n>6:
