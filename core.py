@@ -199,6 +199,20 @@ class Symbol:
         return str(true[self.letter_n()])
 
     def after(self):
+        n = self.prev
+        if n is not None:
+            bracount = 0
+            found = False
+            while n is not None:
+                if n.n == 5:
+                    bracount += 1
+                    found = True
+                if n.n == 6:
+                    bracount -= 1
+                n = n.prev
+            if bracount < 0 or (found and bracount==0):
+                return ([Symbol(6,self)],False)
+
         if self.n==0: return ([Symbol(i,self) for i in [0,5]],True)
         if self.n==1: return ([Symbol(i,self) for i in [0,5]],True)
         if self.n==2: return ([Symbol(i,self) for i in [0,5]],True)
