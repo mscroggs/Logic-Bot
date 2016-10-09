@@ -5,7 +5,7 @@ f.next()
 
 if len(sys.argv)>=2:
     with open(sys.argv[1],"w") as file:
-        pass
+        file.write("# KEY\n#  - not\n#  + and\n#  / o\n#  > implies\n#  = if and only if\n#  a-z and A-J represent variables\n")
 
 count = 0
 leng = 1
@@ -18,7 +18,7 @@ try:
             print(f)
             if len(sys.argv)>=2:
                 with open(sys.argv[1],"a") as file:
-                    file.write(f.as_ascii()+"\n")
+                    file.write("\n"+f.as_ascii())
         f.next()
         while leng < len(f):
             seq.append(count)
