@@ -12,6 +12,13 @@ class Formula:
     def __init__(self, current=[0]):
         self.list = current
 
+    def has_sub_tautology(self):
+        for j in range(1,len(self)+1):
+            for i in range(j):
+                if (i>0 or j<len(self)) and self.is_sub_tautology(i,j):
+                    return True
+        return False
+
     def next(self):
         n = len(self.list)-1
         self.list[n] += 1
@@ -41,10 +48,10 @@ class Formula:
             output.append(afters)
         return output
 
-    def as_machine(self, true):
+    def as_machine(self, true, a=None, b=None):
         mach = ""
-        sls = self.get_symbol_lists()
-        for i,n in enumerate(self.list):
+        sls = self.get_symbol_lists()[a:b]
+        for i,n in enumerate(self.list[a:b]):
             mach += sls[i][n].as_machine(true)
         return mach
 
@@ -58,9 +65,9 @@ class Formula:
                 c += 1
         return o==c
 
-    def get_truth(self, true):
+    def get_truth(self, true, a=None, b=None):
         old_mach = "z"
-        mach = self.as_machine(true)
+        mach = self.as_machine(true, a, b)
 
         while mach!=old_mach:
             old_mach = mach
@@ -109,6 +116,18 @@ class Formula:
         for true in product([0,1],repeat=self.highest_letter()+1):
             try:
                 if not self.get_truth(true):
+                    return False
+            except InvalidFormula:
+                return False
+        return True
+
+    def is_sub_tautology(self, a=None, b=None):
+        from itertools import product
+        if not self.brackets_match():
+            return False
+        for true in product([0,1],repeat=self.highest_letter()+1):
+            try:
+                if not self.get_truth(true, a, b):
                     return False
             except InvalidFormula:
                 return False

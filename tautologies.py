@@ -3,6 +3,10 @@ import sys
 f = Formula()
 f.next()
 
+if len(sys.argv)>=2:
+    with open(sys.argv[1],"w") as file:
+        pass
+
 count = 0
 leng = 1
 seq = []
