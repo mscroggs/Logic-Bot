@@ -12,3 +12,4 @@ Run `next_tautology.py` to find the next tautology (based on what is saved in
 the file `last`.
 
 Run `tautologies.py` to print a list of all tautologies.
+Run `contradictions.py` to print a list of all contradictions.
