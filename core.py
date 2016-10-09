@@ -5,9 +5,19 @@ greek_lowercase = [u'\u03B1',u'\u03B2',u'\u03B3',u'\u03B4',u'\u03B5',u'\u03B6',
                    u'\u03C4',u'\u03C5',u'\u03C6',u'\u03C7',u'\u03C8',u'\u03C9']
 letters =  [i for i in ascii_lowercase] + greek_lowercase
 
+class InvalidFormula(BaseException):
+    pass
+
 class Formula:
     def __init__(self, current=[0]):
         self.list = current
+
+    def has_sub_tautology(self):
+        for j in range(1,len(self)+1):
+            for i in range(j):
+                if (i>0 or j<len(self)) and self.is_sub_tautology(i,j):
+                    return True
+        return False
 
     def next(self):
         n = len(self.list)-1
@@ -32,22 +42,32 @@ class Formula:
             sym = output[i][n]
             afters,letter_next = sym.after()
             if letter_next:
-                afters += [Symbol(j+7) for j in range(ok_letters+2)]
+                afters += [Symbol(j+7,afters[0].prev) for j in range(ok_letters+2)]
             if sym.is_letter():
                 ok_letters = max(ok_letters,sym.letter_n())
             output.append(afters)
         return output
 
-    def as_machine(self, true):
+    def as_machine(self, true, a=None, b=None):
         mach = ""
-        sls = self.get_symbol_lists()
-        for i,n in enumerate(self.list):
+        sls = self.get_symbol_lists()[a:b]
+        for i,n in enumerate(self.list[a:b]):
             mach += sls[i][n].as_machine(true)
         return mach
 
-    def get_truth(self, true):
+    def brackets_match(self):
+        o = 0
+        c = 0
+        for i in self.as_ascii():
+            if i == ")":
+                o += 1
+            if i == "(":
+                c += 1
+        return o==c
+
+    def get_truth(self, true, a=None, b=None):
         old_mach = "z"
-        mach = self.as_machine(true)
+        mach = self.as_machine(true, a, b)
 
         while mach!=old_mach:
             old_mach = mach
@@ -79,7 +99,7 @@ class Formula:
             return True
         if mach == "0":
             return False
-        return None
+        raise InvalidFormula
 
     def highest_letter(self):
         max_l = -1
@@ -91,8 +111,37 @@ class Formula:
 
     def is_tautology(self):
         from itertools import product
+        if not self.brackets_match():
+            return False
         for true in product([0,1],repeat=self.highest_letter()+1):
-            if not self.get_truth(true):
+            try:
+                if not self.get_truth(true):
+                    return False
+            except InvalidFormula:
+                return False
+        return True
+
+    def is_sub_tautology(self, a=None, b=None):
+        from itertools import product
+        if not self.brackets_match():
+            return False
+        for true in product([0,1],repeat=self.highest_letter()+1):
+            try:
+                if not self.get_truth(true, a, b):
+                    return False
+            except InvalidFormula:
+                return False
+        return True
+
+    def is_contradiction(self):
+        from itertools import product
+        if not self.brackets_match():
+            return False
+        for true in product([0,1],repeat=self.highest_letter()+1):
+            try:
+                if self.get_truth(true):
+                    return False
+            except InvalidFormula:
                 return False
         return True
 
@@ -111,9 +160,13 @@ class Formula:
     def __str__(self):
         return self.as_ascii()
 
+    def __len__(self):
+        return len(self.list)
+
 class Symbol:
-    def __init__(self,n):
+    def __init__(self, n, prev=None):
         self.n = n
+        self.prev = prev
 
     def as_ascii(self):
         if self.n==0: return "-"
@@ -146,14 +199,22 @@ class Symbol:
         return str(true[self.letter_n()])
 
     def after(self):
-        if self.n==0: return ([Symbol(i) for i in [0,5,6]],True)
-        if self.n==1: return ([Symbol(i) for i in [0,5]],True)
-        if self.n==2: return ([Symbol(i) for i in [0,5]],True)
-        if self.n==3: return ([Symbol(i) for i in [0,5]],True)
-        if self.n==4: return ([Symbol(i) for i in [0,5]],True)
-        if self.n==5: return ([Symbol(i) for i in [0,5]],True)
-        if self.n==6: return ([Symbol(i) for i in [1,2,3,4,6]],False)
-        return ([Symbol(i) for i in [1,2,3,4,6]],False)
+        if self.n==0: return ([Symbol(i,self) for i in [0,5]],True)
+        if self.n==1: return ([Symbol(i,self) for i in [0,5]],True)
+        if self.n==2: return ([Symbol(i,self) for i in [0,5]],True)
+        if self.n==3: return ([Symbol(i,self) for i in [0,5]],True)
+        if self.n==4: return ([Symbol(i,self) for i in [0,5]],True)
+        if self.n==5: return ([Symbol(i,self) for i in [0,5]],True)
+        if self.n==6: return ([Symbol(i,self) for i in [1,2,3,4,6]],False)
+        n = self.prev
+        while n is not None and n.n == 0:
+            n = n.prev
+        if n is not None:
+            if n.n==5:
+                return ([Symbol(i,self) for i in [1,2,3,4]],False)
+            if n.n in [1,2,3,4]:
+                return ([Symbol(6,self)],False)
+        return ([Symbol(i,self) for i in [1,2,3,4,6]],False)
 
     def is_letter(self):
         if self.n>6:
