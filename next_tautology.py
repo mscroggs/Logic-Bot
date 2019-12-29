@@ -1,25 +1,33 @@
-from core import Formula
+from logic_core import Formula
 
-with open("running") as f:
-    run = f.read()
+with open("/home/pi/logic/last") as f:
+    last = [int(i) for i in f.read().split(",")]
 
-if run!="yes":
-    with open("running","w") as f:
-        run = f.write("yes")
+fo = Formula(last)
+fo.next()
 
-    with open("last") as f:
-        last = [int(i) for i in f.read().split(",")]
-
-    fo = Formula(last)
+while not fo.is_tautology():
     fo.next()
+    print(fo)
 
-    while not fo.is_tautology():
-        fo.next()
+import twitter
+from mastodon import Mastodon
 
-    print fo
+config = {}
+execfile("/home/pi/logic/config.py", config)
 
-    with open("last","w") as f:
-        f.write(",".join([str(i) for i in fo.list]))
+tau = twitter.Twitter(
+    auth = twitter.OAuth(config["access_key"], config["access_secret"], config["consumer_key"], config["consumer_secret"]))
 
-    with open("running","w") as f:
-        run = f.write("no")
+results = tau.statuses.update(status = fo.as_unicode())
+print(fo)
+
+toot = Mastodon(
+    access_token = 'mathstodon_usercred.secret',
+    api_base_url = 'https://mathstodon.xyz'
+)
+
+toot.toot(fo.as_unicode())
+
+with open("/home/pi/logic/last","w") as f:
+    f.write(",".join([str(i) for i in fo.list]))
