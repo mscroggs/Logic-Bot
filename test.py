@@ -1,4 +1,4 @@
-from core import Formula
+from logic_core import Formula
 from time import time
 
 start = time()

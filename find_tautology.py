@@ -1,4 +1,4 @@
-from core import Formula
+from logic_core import Formula
 
 f = Formula()
 f.next()
