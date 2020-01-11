@@ -1,7 +1,7 @@
 # Logic Bot
 
 View the explanation of this repository at http://www.mscroggs.co.uk/blog/13
-and http://www.mscroggs.co.uk/16.
+and http://www.mscroggs.co.uk/blog/16.
 
 This branch will generate the tautologies in order without saving them all
 to a file.
