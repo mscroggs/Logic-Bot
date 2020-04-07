@@ -2,4 +2,5 @@ config.py
 sequence
 tautologies
 *.pyc
-
+*.secret
+.*.swp

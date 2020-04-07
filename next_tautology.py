@@ -13,14 +13,16 @@ while not fo.is_tautology():
 import twitter
 from mastodon import Mastodon
 
-config = {}
-execfile("/home/pi/logic/config.py", config)
+import config
 
 tau = twitter.Twitter(
-    auth = twitter.OAuth(config["access_key"], config["access_secret"], config["consumer_key"], config["consumer_secret"]))
+    auth = twitter.OAuth(config.access_key, config.access_secret, config.consumer_key, config.consumer_secret))
 
 results = tau.statuses.update(status = fo.as_unicode())
 print(fo)
+
+with open("/home/pi/logic/last","w") as f:
+    f.write(",".join([str(i) for i in fo.list]))
 
 toot = Mastodon(
     access_token = 'mathstodon_usercred.secret',
@@ -29,5 +31,3 @@ toot = Mastodon(
 
 toot.toot(fo.as_unicode())
 
-with open("/home/pi/logic/last","w") as f:
-    f.write(",".join([str(i) for i in fo.list]))
