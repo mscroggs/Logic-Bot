@@ -25,4 +25,4 @@ try:
             leng += 1
             count = 0
 except KeyboardInterrupt:
-    print ",".join([str(i) for i in seq])
+    print(",".join([str(i) for i in seq]))

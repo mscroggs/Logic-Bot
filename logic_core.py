@@ -9,8 +9,12 @@ class InvalidFormula(BaseException):
     pass
 
 class Formula:
-    def __init__(self, current=[0]):
-        self.list = current
+    def __init__(self, current=None, allow_true_and_false=False):
+        if current is None:
+            self.list = [0]
+        else:
+            self.list = current
+        self.allow_true_and_false = allow_true_and_false
 
     def has_sub_tautology(self):
         for j in range(1,len(self)+1):
@@ -37,12 +41,13 @@ class Formula:
 
     def get_symbol_lists(self):
         ok_letters = -1
-        output = [[Symbol(0),Symbol(5)]]
+        output = [[Symbol(0, allow_true_and_false=self.allow_true_and_false),
+                   Symbol(5, allow_true_and_false=self.allow_true_and_false)]]
         for i,n in enumerate(self.list[:-1]):
             sym = output[i][n]
             afters,letter_next = sym.after()
             if letter_next:
-                afters += [Symbol(j+7,afters[0].prev) for j in range(ok_letters+2)]
+                afters += [Symbol(j+7,afters[0].prev, allow_true_and_false=self.allow_true_and_false) for j in range(ok_letters+2)]
             if sym.is_letter():
                 ok_letters = max(ok_letters,sym.letter_n())
             output.append(afters)
@@ -146,14 +151,21 @@ class Formula:
         return True
 
     def as_ascii(self):
-        output=""
-        for i,n in enumerate(self.list):
+        output = ""
+        for i, n in enumerate(self.list):
             output += self.get_symbol_lists()[i][n].as_ascii()
         return output
 
-    def as_unicode(self):
-        output=""
+    def as_tex(self):
+        output = "\\("
         for i,n in enumerate(self.list):
+            output += self.get_symbol_lists()[i][n].as_tex()
+        output += "\\)"
+        return output
+
+    def as_unicode(self):
+        output = ""
+        for i, n in enumerate(self.list):
             output += self.get_symbol_lists()[i][n].as_unicode()
         return output
 
@@ -164,9 +176,14 @@ class Formula:
         return len(self.list)
 
 class Symbol:
-    def __init__(self, n, prev=None):
+    def __init__(self, n, prev=None, allow_true_and_false=False):
         self.n = n
         self.prev = prev
+        if allow_true_and_false:
+            self.tf = [-1, -2]
+        else:
+            self.tf = []
+        self.allow_true_and_false = allow_true_and_false
 
     def as_ascii(self):
         if self.n==0: return "-"
@@ -176,6 +193,20 @@ class Symbol:
         if self.n==4: return ">"
         if self.n==5: return "("
         if self.n==6: return ")"
+        if self.n==-1: return "1"
+        if self.n==-2: return "0"
+        return letters[self.letter_n()]
+
+    def as_tex(self):
+        if self.n==0: return "\\lnot"
+        if self.n==1: return "\\land"
+        if self.n==2: return "\\lor"
+        if self.n==3: return "\\leftrightarrow"
+        if self.n==4: return "\\rightarrow"
+        if self.n==5: return "("
+        if self.n==6: return ")"
+        if self.n==-1: return "\\textsc{True}"
+        if self.n==-2: return "\\textsc{False}"
         return letters[self.letter_n()]
 
     def as_unicode(self):
@@ -186,6 +217,8 @@ class Symbol:
         if self.n==4: return u"\u21FE"
         if self.n==5: return "("
         if self.n==6: return ")"
+        if self.n==-1: return "1"
+        if self.n==-2: return "0"
         return letters[self.letter_n()]
 
     def as_machine(self, true):
@@ -196,6 +229,8 @@ class Symbol:
         if self.n==4: return "IMP"
         if self.n==5: return "("
         if self.n==6: return ")"
+        if self.n==-1: return "1"
+        if self.n==-2: return "0"
         return str(true[self.letter_n()])
 
     def after(self):
@@ -213,24 +248,24 @@ class Symbol:
             if bracount < 0 or (found and bracount==0):
                 return ([Symbol(6,self)],False)
 
-        if self.n==0: return ([Symbol(i,self) for i in [0,5]],True)
-        if self.n==1: return ([Symbol(i,self) for i in [0,5]],True)
-        if self.n==2: return ([Symbol(i,self) for i in [0,5]],True)
-        if self.n==3: return ([Symbol(i,self) for i in [0,5]],True)
-        if self.n==4: return ([Symbol(i,self) for i in [0,5]],True)
-        if self.n==5: return ([Symbol(i,self) for i in [0,5]],True)
-        if self.n==6: return ([Symbol(i,self) for i in [1,2,3,4,6]],False)
+        if self.n==0: return ([Symbol(i,self, allow_true_and_false=self.allow_true_and_false) for i in [0,5]+self.tf], True)
+        if self.n==1: return ([Symbol(i,self, allow_true_and_false=self.allow_true_and_false) for i in [0,5]+self.tf], True)
+        if self.n==2: return ([Symbol(i,self, allow_true_and_false=self.allow_true_and_false) for i in [0,5]+self.tf], True)
+        if self.n==3: return ([Symbol(i,self, allow_true_and_false=self.allow_true_and_false) for i in [0,5]+self.tf], True)
+        if self.n==4: return ([Symbol(i,self, allow_true_and_false=self.allow_true_and_false) for i in [0,5]+self.tf], True)
+        if self.n==5: return ([Symbol(i,self, allow_true_and_false=self.allow_true_and_false) for i in [0,5]+self.tf], True)
+        if self.n==6: return ([Symbol(i,self, allow_true_and_false=self.allow_true_and_false) for i in [1,2,3,4,6]],False)
         n = self.prev
         while n is not None and n.n == 0:
             n = n.prev
         if n is not None:
             if n.n == 5:
-                return ([Symbol(i,self) for i in [1,2,3,4]],False)
+                return ([Symbol(i,self, allow_true_and_false=self.allow_true_and_false) for i in [1,2,3,4]],False)
             if n.n in [1,2,3,4]:
-                return ([Symbol(6,self)],False)
+                return ([Symbol(6,self, allow_true_and_false=self.allow_true_and_false)],False)
             if n.n == 6:
-                return ([Symbol(i,self) for i in [1,2,3,4,6]],False)
-        return ([Symbol(6,self)],False)
+                return ([Symbol(i,self, allow_true_and_false=self.allow_true_and_false) for i in [1,2,3,4,6]],False)
+        return ([Symbol(6,self, allow_true_and_false=self.allow_true_and_false)],False)
 
     def is_letter(self):
         if self.n>6:
