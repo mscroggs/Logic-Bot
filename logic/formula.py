@@ -7,7 +7,7 @@ class InvalidFormula(BaseException):
 
 
 class Formula:
-    def __init__(self, list=[]):
+    def __init__(self, list=[], replacements=None):
         self._list = list
 
         self._vars = []
@@ -15,11 +15,14 @@ class Formula:
             if isinstance(i, Variable) and i not in self._vars:
                 self._vars.append(i)
         used = []
-        self._reps = []
-        for i in self._list:
-            if i.machine not in used:
-                used.append(i.machine)
-                self._reps += i.replacements
+        if replacements is None:
+            self._reps = []
+            for i in self._list:
+                if i.machine not in used:
+                    used.append(i.machine)
+                    self._reps += i.replacements
+        else:
+            self._reps = replacements
 
     def __getitem__(self, i):
         return self._list[i]
@@ -43,7 +46,7 @@ class Formula:
         replacements = self.get_replacements()
         while len(machine) > 1:
             pre = machine
-            for i,j in replacements:
+            for i, j in replacements:
                 machine = j.join(machine.split(i))
             if pre == machine:
                 raise InvalidFormula
@@ -92,6 +95,3 @@ class Formula:
 
     def __str__(self):
         return "".join(str(i) for i in self._list)
-
-    def __len__(self):
-        return len(self._list)

@@ -1,6 +1,7 @@
 from logic import FormulaFactory
 from time import time
 
+
 def test_sequence():
     start = time()
 
@@ -13,7 +14,7 @@ def test_sequence():
         if f.formula.is_tautology():
             count += 1
         f.next()
-        while len(f.formula)>leng:
+        while len(f.formula) > leng:
             if leng == 5:
                 assert count == 2
             elif leng == 6:
@@ -29,5 +30,4 @@ def test_sequence():
             leng += 1
             count = 0
 
-    print("Time taken: "+str(time()-start)+"s")
-
+    print("Time taken: " + str(time() - start) + "s")

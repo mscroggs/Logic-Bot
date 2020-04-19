@@ -1,10 +1,12 @@
 from string import ascii_lowercase
-ascii_lowercase = [i for i in ascii_lowercase if i != "v"]  # Remove v because v is "OR"
-greek_lowercase = [u'\u03B1',u'\u03B2',u'\u03B3',u'\u03B4',u'\u03B5',u'\u03B6',
-                   u'\u03B7',u'\u03B8',u'\u03B9',u'\u03BA',u'\u03BB',u'\u03BC',
-                   u'\u03BD',u'\u03BE',u'\u03BF',u'\u03C0',u'\u03C1',u'\u03C3',
-                   u'\u03C4',u'\u03C5',u'\u03C6',u'\u03C7',u'\u03C8',u'\u03C9']
-letters =  ascii_lowercase + greek_lowercase
+# Remove v because v is "OR"
+ascii_lowercase = [i for i in ascii_lowercase if i != "v"]
+greek_lowercase = [u'\u03B1', u'\u03B2', u'\u03B3', u'\u03B4', u'\u03B5',
+                   u'\u03B6', u'\u03B7', u'\u03B8', u'\u03B9', u'\u03BA',
+                   u'\u03BB', u'\u03BC', u'\u03BD', u'\u03BE', u'\u03BF',
+                   u'\u03C0', u'\u03C1', u'\u03C3', u'\u03C4', u'\u03C5',
+                   u'\u03C6', u'\u03C7', u'\u03C8', u'\u03C9']
+letters = ascii_lowercase + greek_lowercase
 tex_letters = ascii_lowercase
 
 
@@ -12,6 +14,12 @@ def bool_to_machine(b):
     if b:
         return "1"
     return "0"
+
+
+def bool_to_str(b):
+    if b:
+        return "True"
+    return "False"
 
 
 class Symbol:
@@ -32,16 +40,14 @@ class Symbol:
 
 class Bool(Symbol):
     def __init__(self, n, bool):
-        if bool:
-            super().__init__(n, "1", ascii="1", unicode="1", tex="\\textsc{True}")
-        else:
-            super().__init__(n, "0", ascii="0", unicode="0", tex="\\textsc{False}")
+        super().__init__(n, bool_to_machine(bool), ascii="1", unicode="1",
+                         tex="\\textsc{" + bool_to_str(bool) + "}")
 
 
 class UnarySymbol(Symbol):
     def __init__(self, n, truth_table, machine, **kwargs):
         super().__init__(n, machine, **kwargs)
-        for i,res in truth_table:
+        for i, res in truth_table:
             self.replacements.append((self.machine + bool_to_machine(i),
                                       bool_to_machine(res)))
 
@@ -49,8 +55,10 @@ class UnarySymbol(Symbol):
 class BinarySymbol(Symbol):
     def __init__(self, n, truth_table, machine, **kwargs):
         super().__init__(n, machine, **kwargs)
-        for i,j,res in truth_table:
-            self.replacements.append(("(" + bool_to_machine(i) + self.machine + bool_to_machine(j) + ")",
+        for i, j, res in truth_table:
+            self.replacements.append(("(" + bool_to_machine(i)
+                                      + self.machine
+                                      + bool_to_machine(j) + ")",
                                       bool_to_machine(res)))
 
 
@@ -68,7 +76,8 @@ class Variable(Symbol):
             tex = tex_letters[var_n]
         else:
             tex = None
-        super().__init__(n, "VAR["+str(var_n)+"]", ascii=ascii, unicode=unicode, tex=tex)
+        super().__init__(n, "VAR["+str(var_n)+"]", ascii=ascii,
+                         unicode=unicode, tex=tex)
         self.var_n = var_n
 
 
@@ -96,15 +105,21 @@ class Symbols:
                         "OR", ascii="v", unicode=u"\u2228", tex="\\lor")
         self.add_binary([(True, True, True), (True, False, False),
                          (False, True, False), (False, False, True)],
-                        "IFF", ascii="=", unicode=u"\u21FF", tex="\\leftrightarrow")
+                        "IFF", ascii="=", unicode=u"\u21FF",
+                        tex="\\leftrightarrow")
         self.add_binary([(True, True, True), (True, False, False),
                          (False, True, True), (False, False, True)],
-                        "IMP", ascii=">", unicode=u"\u21FE", tex="\\rightarrow")
+                        "IMP", ascii=">", unicode=u"\u21FE",
+                        tex="\\rightarrow")
 
         if allow_true_and_false:
             self.add_bool(True)
             self.add_bool(False)
         self.allow_not_not = allow_not_not
+
+        self.replacements = []
+        for i in self._symbols:
+            self.replacements += i.replacements
 
     def next(self, prev, current):
         follow = self.follow(prev)
@@ -114,16 +129,21 @@ class Symbols:
         if len(prev) == 0:
             return [self._open] + self._unary
         if prev[-1] == self._open:
-            return [self._open] + self._unary + self._bool + self.variables_follow(prev)
+            return ([self._open] + self._unary + self._bool
+                    + self.variables_follow(prev))
         if prev[-1] == self._close:
             return [self._close] + self._binary
         if isinstance(prev[-1], BinarySymbol):
-            return [self._open] + self._unary + self._bool + self.variables_follow(prev)
+            return ([self._open] + self._unary + self._bool
+                    + self.variables_follow(prev))
         if isinstance(prev[-1], UnarySymbol):
             if self.allow_not_not:
-                return [self._open] + self._unary + self._bool + self.variables_follow(prev)
+                return ([self._open] + self._unary + self._bool
+                        + self.variables_follow(prev))
             else:
-                return [self._open] + [i for i in self._unary if i != prev[-1]] + self._bool + self.variables_follow(prev)
+                return ([self._open]
+                        + [i for i in self._unary if i != prev[-1]]
+                        + self._bool + self.variables_follow(prev))
         if isinstance(prev[-1], Bool) or isinstance(prev[-1], Variable):
             return [self._close] + self._binary
         raise ValueError("Unknown Symbol.")
@@ -139,7 +159,7 @@ class Symbols:
         return self._symbols[i]
 
     def get_machine_name(self):
-        out = _next_machine
+        out = self._next_machine
         self._next_machine += "A"
         return out
 
@@ -149,7 +169,8 @@ class Symbols:
         return self._variables[n]
 
     def add_variable(self):
-        self._symbols.append(Variable(len(self._symbols), len(self._variables)))
+        self._symbols.append(Variable(len(self._symbols),
+                                      len(self._variables)))
         self._variables.append(self._symbols[-1])
 
     def add_symbol(self, machine=None, **kwargs):
@@ -160,13 +181,15 @@ class Symbols:
     def add_binary(self, truth_table, machine=None, **kwargs):
         if machine is None:
             machine = self.get_machine_name()
-        self._symbols.append(BinarySymbol(len(self._symbols), truth_table, machine, **kwargs))
+        self._symbols.append(BinarySymbol(len(self._symbols), truth_table,
+                                          machine, **kwargs))
         self._binary.append(self._symbols[-1])
 
     def add_unary(self, truth_table, machine=None, **kwargs):
         if machine is None:
             machine = self.get_machine_name()
-        self._symbols.append(UnarySymbol(len(self._symbols), truth_table, machine, **kwargs))
+        self._symbols.append(UnarySymbol(len(self._symbols), truth_table,
+                                         machine, **kwargs))
         self._unary.append(self._symbols[-1])
 
     def add_bool(self):

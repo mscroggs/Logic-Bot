@@ -1,9 +1,10 @@
-from .formula import Formula, InvalidFormula
+from .formula import Formula
 from .symbols import Symbols
 
 
 class FormulaFactory:
-    def __init__(self, start=None, allow_true_and_false=False, allow_not_not=True):
+    def __init__(self, start=None, allow_true_and_false=False,
+                 allow_not_not=True):
         self.allow_true_and_false = allow_true_and_false
         self.allow_not_not = allow_not_not
         self.symbols = Symbols(allow_true_and_false, allow_not_not)
@@ -28,7 +29,8 @@ class FormulaFactory:
             return
         new_list = self.formula[:position]
         try:
-            new_list.append(self.symbols.next(new_list, self.formula[position]))
+            new_list.append(self.symbols.next(new_list,
+                                              self.formula[position]))
         except IndexError:
             return self.move_forward(position-1)
         while len(new_list) < len(self.formula):
