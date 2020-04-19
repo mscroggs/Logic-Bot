@@ -22,17 +22,30 @@ def get_tautologies(f, test=lambda x:True):
     output("\n")
     print("-------------")
 
-
+# tautologies
 f = Formula()
 get_tautologies(f)
 
+# Allow True and False
 f = Formula(allow_true_and_false=True)
 get_tautologies(f)
 
-f = Formula(allow_true_and_false=True)
+# Ban NOT NOT
+f = Formula(allow_true_and_false=True, allow_not_not=False)
+get_tautologies(f)
+
+# Ignore if special case of a tautology (eg (0=0) is special case of (a=a))
+f = Formula(allow_true_and_false=True, allow_not_not=False)
 def check(x):
-    if "--" in x.as_ascii():
-        return False
+    from IPython import embed; embed()()
+    if -1 in x.list:
+        from IPython import embed; embed()()
+        y = formula([150 if i==-1 else i for i in x.list])
+        if y.is_tautology():
+            return False
+    if -2 in x.list:
+        y = formula([150 if i==-2 else i for i in x.list])
+        if y.is_tautology():
+            return False
     return True
 get_tautologies(f, check)
-

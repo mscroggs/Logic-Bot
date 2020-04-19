@@ -1,19 +1,19 @@
-from logic_core import Formula
+from logic_core import Formula, FormulaFactory
 from time import time
 
 start = time()
 
-f = Formula()
+f = FormulaFactory()
 f.next()
 
 leng = 0
 count = 0
 while leng <= 8:
-    if f.is_tautology():
-        print f
+    if f.formula.is_tautology():
+        print(f.formula)
         count += 1
     f.next()
-    while len(f)>leng:
+    while len(f.formula)>leng:
         if leng == 5:
             assert count == 2
         if leng == 6:
@@ -26,3 +26,4 @@ while leng <= 8:
         count = 0
 
 print("Time taken: "+str(time()-start)+"s")
+
