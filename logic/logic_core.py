@@ -259,10 +259,7 @@ class Formula:
         assert len(vars) == len(values)
         machine = self.as_machine()
         for v, t in zip(vars, values):
-            if t:
-                machine = "1".join(machine.split(v.machine))
-            else:
-                machine = "0".join(machine.split(v.machine))
+            machine = bool_to_machine(t).join(machine.split(v.machine))
         return self.simplify(machine)
 
     def is_tautology(self):
