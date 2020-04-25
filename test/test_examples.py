@@ -13,3 +13,10 @@ def test_tautologies():
 
         f.set_ascii("-" + a)
         assert f.formula.is_contradiction()
+
+
+def text_next():
+    f = FormulaFactory
+    for a in ["(a=(a=(-bvb)))"]:
+        f.set_ascii(a)
+        f.next()
