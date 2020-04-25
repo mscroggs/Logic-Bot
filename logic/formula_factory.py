@@ -3,19 +3,17 @@ from .symbols import Symbols
 
 
 class FormulaFactory:
-    def __init__(self, start=None, allow_true_and_false=False,
+    def __init__(self, allow_true_and_false=False,
                  allow_not_not=True):
         self.allow_true_and_false = allow_true_and_false
         self.allow_not_not = allow_not_not
         self.symbols = Symbols(allow_true_and_false, allow_not_not)
-        if start is None:
-            self.formula = Formula([self.symbols.follow()[0]])
-        else:
-            self.formula = Formula([self.symbols[i] for i in start])
+        self.formula = Formula([self.symbols.follow()[0]])
 
     def next(self):
         self.move_forward()
         while not self.formula.is_valid():
+            print(self.formula)
             self.move_forward()
 
     def move_forward(self, position=None):

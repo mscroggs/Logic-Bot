@@ -141,25 +141,25 @@ class Symbols:
 
     def follow(self, prev=[]):
         if len(prev) == 0:
-            return [self._open] + self._unary
+            return self._unary + [self._open]
         if prev[-1] == self._open:
-            return ([self._open] + self._unary + self._bool
+            return (self._unary + self._bool + [self._open]
                     + self.variables_follow(prev))
         if prev[-1] == self._close:
-            return [self._close] + self._binary
+            return self._binary + [self._close]
         if isinstance(prev[-1], BinarySymbol):
-            return ([self._open] + self._unary + self._bool
+            return (self._unary + self._bool + [self._open]
                     + self.variables_follow(prev))
         if isinstance(prev[-1], UnarySymbol):
             if self.allow_not_not:
-                return ([self._open] + self._unary + self._bool
+                return (self._unary + self._bool + [self._open]
                         + self.variables_follow(prev))
             else:
-                return ([self._open]
-                        + [i for i in self._unary if i != prev[-1]]
-                        + self._bool + self.variables_follow(prev))
+                return ([i for i in self._unary if i != prev[-1]]
+                        + self._bool + [self._open]
+                        + self.variables_follow(prev))
         if isinstance(prev[-1], Bool) or isinstance(prev[-1], Variable):
-            return [self._close] + self._binary
+            return self._binary + [self._close]
         raise ValueError("Unknown Symbol.")
 
     def variables_follow(self, prev):

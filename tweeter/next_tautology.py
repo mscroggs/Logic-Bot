@@ -18,10 +18,9 @@ def toot(status):
     toot.toot(status)
 
 
+fac = FormulaFactory()
 with open("last") as f:
-    last = f.read()
-
-fac = FormulaFactory(ascii=last)
+    fac.set_ascii(f.read())
 fac.next()
 
 while not fac.formula.is_tautology():
