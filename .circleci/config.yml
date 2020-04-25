@@ -26,6 +26,7 @@ jobs:
       - run:
           command: python3 -m pytest test/
           name: Run tests
+      - run-scripts
   run-scripts:
     executor: python/default
     steps:
