@@ -23,14 +23,15 @@ def bool_to_str(b):
 
 
 class Symbol:
-    def __init__(self, n, machine, ascii=None, unicode=None, tex=None, name=None):
+    def __init__(self, n, machine, ascii=None, unicode=None, tex=None,
+                 name=None):
         self.ascii = ascii
         self.unicode = unicode
         self.machine = machine
         self.tex = tex
         self.n = n
         self.replacements = []
-        self.name = Name
+        self.name = name
 
     def __str__(self):
         return self.ascii
