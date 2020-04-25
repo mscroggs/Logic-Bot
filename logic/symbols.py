@@ -235,7 +235,7 @@ class Symbols:
                                          machine, **kwargs))
         self._unary.append(self._symbols[-1])
 
-    def add_bool(self):
+    def add_bool(self, bool):
         self._symbols.append(Bool(len(self._symbols), bool))
         self._bool.append(self._symbols[-1])
 
