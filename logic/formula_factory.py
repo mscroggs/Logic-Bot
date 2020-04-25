@@ -14,7 +14,7 @@ class FormulaFactory:
 
     def move_forward(self, position=None):
         if position is None:
-            position = len(self.symbols) - 1
+            position = len(self.formula) - 1
         if position < 0:
             new_list = [self.symbols.follow()[0]]
             while len(new_list) <= len(self.formula):
