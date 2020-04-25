@@ -10,10 +10,23 @@ jobs:
       - checkout
       - python/load-cache
       - python/install-deps
+      - run:
+          command: pip3 install flake8 pytest
+          name: Install flake8 and pytest
       - python/save-cache
       - run:
-          command: ./manage.py test
+          command: python3 -m flake8 logic --exclude=__init__.py
+          name: Flake8 checks on logic
+      - run:
+          command: python3 -m flake8 test
+          name: Flake8 checks on tests
+      - run:
+          command: pip3 install . --user -v
+          name: Install
+      - run:
+          command: python3 -m pytest test/
           name: Test
+
 
 workflows:
   main:
