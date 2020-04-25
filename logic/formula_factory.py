@@ -10,7 +10,6 @@ class FormulaFactory:
     def next(self):
         self.move_forward()
         while not self.formula.is_valid():
-            print(self.formula)
             self.move_forward()
 
     def move_forward(self, position=None):

@@ -144,27 +144,30 @@ class Symbols:
         return follow[follow.index(current)+1]
 
     def follow(self, prev=[]):
+        """Returns a list of characters that could follow prev."""
+        # If this is the first character
         if len(prev) == 0:
             return self._unary + [self._open]
+        # If no brackets have been opened
         if prev.count(self._open) == 0:
             if self.allow_not_not:
                 return self._unary + [self._open]
             else:
                 return [i for i in self._unary if i != prev[-1]] + [self._open]
 
-        if prev.count(self._open) > 0:
-            if prev.count(self._open) <= prev.count(self._close):
-                return [self._close]
-        if len(prev) == 0:
-            return self._unary + [self._open]
+        # If all brackets are closed, this is invalid, so just return )
+        if prev.count(self._open) <= prev.count(self._close):
+            return [self._close]
+
+        # If last character is (
         if prev[-1] == self._open:
             return (self._unary + self._bool + [self._open]
                     + self.variables_follow(prev))
-        if prev[-1] == self._close:
-            return self._binary + [self._close]
+        # If last character is a binary symbol
         if isinstance(prev[-1], BinarySymbol):
             return (self._unary + self._bool + [self._open]
                     + self.variables_follow(prev))
+        # If last character is a unary symbol
         if isinstance(prev[-1], UnarySymbol):
             if self.allow_not_not:
                 return (self._unary + self._bool + [self._open]
@@ -173,19 +176,20 @@ class Symbols:
                 return ([i for i in self._unary if i != prev[-1]]
                         + self._bool + [self._open]
                         + self.variables_follow(prev))
-        if isinstance(prev[-1], Bool) or isinstance(prev[-1], Variable):
-            op = 0
-            for i in prev[::-1]:
-                if i == self._open:
-                    if op == 0:
-                        break
-                    op -= 1
-                if i == self._close:
-                    op += 1
-                if op == 0 and isinstance(i, BinarySymbol):
-                    return [self._close]
-            return self._binary
-        raise ValueError("Unknown Symbol.")
+        # If the last character is a variable, bool or )
+        assert (isinstance(prev[-1], Bool) or isinstance(prev[-1], Variable)
+                or prev[-1] == self._close)
+        op = 0
+        for i in prev[::-1]:
+            if i == self._open:
+                if op == 0:
+                    break
+                op -= 1
+            if i == self._close:
+                op += 1
+            if op == 0 and isinstance(i, BinarySymbol):
+                return [self._close]
+        return self._binary
 
     def variables_follow(self, prev):
         used = max([-1] + [i.var_n for i in prev if isinstance(i, Variable)])
