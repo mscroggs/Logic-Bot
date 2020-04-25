@@ -18,7 +18,7 @@ jobs:
           command: python3 -m flake8 logic --exclude=__init__.py
           name: Flake8 checks on logic
       - run:
-          command: python3 -m flake8 test scripts
+          command: python3 -m flake8 test scripts tweeter
           name: Flake8 checks on everything else
       - run:
           command: pip3 install . --user -v
