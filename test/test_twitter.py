@@ -1,9 +1,12 @@
 from logic import FormulaFactory
+from time import time
 
 
 def test_twitter():
+    start = time()
+
     fac = FormulaFactory()
-    fac.set_ascii("(av(a>-----b))")
+    fac.set_ascii("(a/(a>-----b))")
     fac.next()
 
     while not fac.formula.is_tautology():
@@ -11,4 +14,6 @@ def test_twitter():
         print(fac.formula)
 
     fac.formula.as_unicode()
-    assert fac.formula.as_ascii() == "(av(a>-(a^a))"
+    print("Time taken: " + str(time() - start) + "s")
+    assert fac.formula.as_ascii() == "(a/(a>-(a+a))"
+

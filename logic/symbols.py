@@ -1,11 +1,10 @@
 from string import ascii_lowercase
-# Remove v because v is "OR"
-ascii_lowercase = [i for i in ascii_lowercase if i != "v"]
-greek_lowercase = [u'\u03B1', u'\u03B2', u'\u03B3', u'\u03B4', u'\u03B5',
-                   u'\u03B6', u'\u03B7', u'\u03B8', u'\u03B9', u'\u03BA',
-                   u'\u03BB', u'\u03BC', u'\u03BD', u'\u03BE', u'\u03BF',
-                   u'\u03C0', u'\u03C1', u'\u03C3', u'\u03C4', u'\u03C5',
-                   u'\u03C6', u'\u03C7', u'\u03C8', u'\u03C9']
+
+ascii_lowercase = [i for i in ascii_lowercase]
+greek_lowercase = [u'\u03B1',u'\u03B2',u'\u03B3',u'\u03B4',u'\u03B5',u'\u03B6',
+                   u'\u03B7',u'\u03B8',u'\u03B9',u'\u03BA',u'\u03BB',u'\u03BC',
+                   u'\u03BD',u'\u03BE',u'\u03BF',u'\u03C0',u'\u03C1',u'\u03C3',
+                   u'\u03C4',u'\u03C5',u'\u03C6',u'\u03C7',u'\u03C8',u'\u03C9']
 letters = ascii_lowercase + greek_lowercase
 tex_letters = ascii_lowercase
 
@@ -84,13 +83,9 @@ class Variable(Symbol):
 
 
 class Symbols:
-    def __init__(self, allow_true_and_false=False, allow_not_not=True):
+    def __init__(self, **params):
         self._next_machine = "A"
         self._symbols = []
-        self.add_symbol("(", ascii="(", unicode="(", tex="(")
-        self.add_symbol(")", ascii=")", unicode=")", tex=")")
-        self._open = self._symbols[0]
-        self._close = self._symbols[1]
         self._unary = []
         self._binary = []
         self._bool = []
@@ -102,11 +97,11 @@ class Symbols:
 
         self.add_binary([(True, True, True), (True, False, False),
                          (False, True, False), (False, False, False)],
-                        "AND", ascii="^", unicode=u"\u2227", tex="\\land",
+                        "AND", ascii="+", unicode=u"\u2227", tex="\\land",
                         name="and")
         self.add_binary([(True, True, True), (True, False, True),
                          (False, True, True), (False, False, False)],
-                        "OR", ascii="v", unicode=u"\u2228", tex="\\lor",
+                        "OR", ascii="/", unicode=u"\u2228", tex="\\lor",
                         name="or")
         self.add_binary([(True, True, True), (True, False, False),
                          (False, True, False), (False, False, True)],
@@ -117,10 +112,18 @@ class Symbols:
                         "IMP", ascii=">", unicode=u"\u21FE",
                         tex="\\rightarrow", name="implies")
 
-        if allow_true_and_false:
+        self.add_symbol("(", ascii="(", unicode="(", tex="(")
+        self._open = self._symbols[-1]
+        self.add_symbol(")", ascii=")", unicode=")", tex=")")
+        self._close = self._symbols[-1]
+
+        if "include_bools" in params and params["include_bools"]:
             self.add_bool(True)
             self.add_bool(False)
-        self.allow_not_not = allow_not_not
+        if "allow_not_not" in params:
+            self.allow_not_not = params["allow_not_not"]
+        else:
+            self.allow_not_not = True
 
         self.replacements = []
         for i in self._symbols:
@@ -142,6 +145,17 @@ class Symbols:
     def follow(self, prev=[]):
         if len(prev) == 0:
             return self._unary + [self._open]
+        if prev.count(self._open) == 0:
+            if self.allow_not_not:
+                return self._unary + [self._open]
+            else:
+                return [i for i in self._unary if i != prev[-1]] + [self._open]
+
+        if prev.count(self._open) > 0:
+            if prev.count(self._open) <= prev.count(self._close):
+                return [self._close]
+        if len(prev) == 0:
+            return self._unary + [self._open]
         if prev[-1] == self._open:
             return (self._unary + self._bool + [self._open]
                     + self.variables_follow(prev))
@@ -159,7 +173,17 @@ class Symbols:
                         + self._bool + [self._open]
                         + self.variables_follow(prev))
         if isinstance(prev[-1], Bool) or isinstance(prev[-1], Variable):
-            return self._binary + [self._close]
+            op = 0
+            for i in prev[::-1]:
+                if i == self._open:
+                    if op == 0:
+                        break
+                    op -= 1
+                if i == self._close:
+                    op += 1
+                if op == 0 and isinstance(i, BinarySymbol):
+                    return [self._close]
+            return self._binary
         raise ValueError("Unknown Symbol.")
 
     def variables_follow(self, prev):
@@ -216,3 +240,4 @@ class Symbols:
         for s in self._symbols:
             if s.ascii == a:
                 return s
+        raise ValueError("Unknown character " + a)
