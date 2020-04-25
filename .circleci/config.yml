@@ -30,7 +30,7 @@ jobs:
 
 commands:
   run-scripts:
-    executor: python/default
+    description: Run scripts
     steps:
       - run:
           command: cd scripts && mkdir script_output
