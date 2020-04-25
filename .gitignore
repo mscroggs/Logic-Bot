@@ -5,3 +5,5 @@ tautologies
 *.secret
 .*.swp
 script_output
+tweeter/last
+
