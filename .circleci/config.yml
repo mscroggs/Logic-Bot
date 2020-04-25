@@ -25,7 +25,11 @@ jobs:
           name: Install
       - run:
           command: python3 -m pytest test/
-          name: Test
+          name: Run tests
+      - run:
+          command: cd scripts && mkdir script_output
+          command: python3 contradictions.py -n 8
+          name: Run scripts
 
 
 workflows:
