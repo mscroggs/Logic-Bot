@@ -1,5 +1,6 @@
 from logic import FormulaFactory
 
+
 def test_twitter():
     fac = FormulaFactory()
     fac.set_ascii("(av(a>-----b))")
