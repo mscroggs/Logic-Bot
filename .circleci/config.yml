@@ -28,7 +28,8 @@ jobs:
           name: Run tests
       - run:
           command: cd scripts && mkdir script_output
-          command: python3 contradictions.py -n 8
+          run:
+            command: python3 contradictions.py -n 8 -f script_output/contradictions
           name: Run scripts
 
 
