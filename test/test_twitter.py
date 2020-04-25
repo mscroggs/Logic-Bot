@@ -15,4 +15,4 @@ def test_twitter():
 
     fac.formula.as_unicode()
     print("Time taken: " + str(time() - start) + "s")
-    assert fac.formula.as_ascii() == "(a/(a>-(a+a))"
+    assert fac.formula.as_ascii() == "(a/(a>-(a+a)))"
