@@ -4,3 +4,4 @@ tautologies
 *.pyc
 *.secret
 .*.swp
+script_output
