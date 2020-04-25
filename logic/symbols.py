@@ -1,10 +1,11 @@
 from string import ascii_lowercase
 
 ascii_lowercase = [i for i in ascii_lowercase]
-greek_lowercase = [u'\u03B1',u'\u03B2',u'\u03B3',u'\u03B4',u'\u03B5',u'\u03B6',
-                   u'\u03B7',u'\u03B8',u'\u03B9',u'\u03BA',u'\u03BB',u'\u03BC',
-                   u'\u03BD',u'\u03BE',u'\u03BF',u'\u03C0',u'\u03C1',u'\u03C3',
-                   u'\u03C4',u'\u03C5',u'\u03C6',u'\u03C7',u'\u03C8',u'\u03C9']
+greek_lowercase = [u'\u03B1', u'\u03B2', u'\u03B3', u'\u03B4', u'\u03B5',
+                   u'\u03B6', u'\u03B7', u'\u03B8', u'\u03B9', u'\u03BA',
+                   u'\u03BB', u'\u03BC', u'\u03BD', u'\u03BE', u'\u03BF',
+                   u'\u03C0', u'\u03C1', u'\u03C3', u'\u03C4', u'\u03C5',
+                   u'\u03C6', u'\u03C7', u'\u03C8', u'\u03C9']
 letters = ascii_lowercase + greek_lowercase
 tex_letters = ascii_lowercase
 
