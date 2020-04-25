@@ -42,7 +42,8 @@ class Symbol:
 
 class Bool(Symbol):
     def __init__(self, n, bool):
-        super().__init__(n, bool_to_machine(bool), ascii="1", unicode="1",
+        super().__init__(n, bool_to_machine(bool), ascii=bool_to_machine(bool),
+                         unicode=bool_to_machine(bool),
                          tex="\\textsc{" + bool_to_str(bool) + "}")
 
 
