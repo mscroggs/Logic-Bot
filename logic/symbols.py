@@ -133,6 +133,7 @@ class Symbols:
         for s in self._binary:
             key += "#  " + s.ascii + " " + s.name + "\n"
         key += "#  a-z represent variables"
+        return key
 
     def next(self, prev, current):
         follow = self.follow(prev)
