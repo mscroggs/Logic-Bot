@@ -23,13 +23,14 @@ def bool_to_str(b):
 
 
 class Symbol:
-    def __init__(self, n, machine, ascii=None, unicode=None, tex=None):
+    def __init__(self, n, machine, ascii=None, unicode=None, tex=None, name=None):
         self.ascii = ascii
         self.unicode = unicode
         self.machine = machine
         self.tex = tex
         self.n = n
         self.replacements = []
+        self.name = Name
 
     def __str__(self):
         return self.ascii
@@ -95,22 +96,25 @@ class Symbols:
         self._variables = []
 
         self.add_unary([(False, True), (True, False)],
-                       "NOT", ascii="-", unicode=u"\u00AC", tex="\\lnot")
+                       "NOT", ascii="-", unicode=u"\u00AC", tex="\\lnot",
+                       name="not")
 
         self.add_binary([(True, True, True), (True, False, False),
                          (False, True, False), (False, False, False)],
-                        "AND", ascii="^", unicode=u"\u2227", tex="\\land")
+                        "AND", ascii="^", unicode=u"\u2227", tex="\\land",
+                        name="and")
         self.add_binary([(True, True, True), (True, False, True),
                          (False, True, True), (False, False, False)],
-                        "OR", ascii="v", unicode=u"\u2228", tex="\\lor")
+                        "OR", ascii="v", unicode=u"\u2228", tex="\\lor",
+                        name="or")
         self.add_binary([(True, True, True), (True, False, False),
                          (False, True, False), (False, False, True)],
                         "IFF", ascii="=", unicode=u"\u21FF",
-                        tex="\\leftrightarrow")
+                        tex="\\leftrightarrow", name="if and only if")
         self.add_binary([(True, True, True), (True, False, False),
                          (False, True, True), (False, False, True)],
                         "IMP", ascii=">", unicode=u"\u21FE",
-                        tex="\\rightarrow")
+                        tex="\\rightarrow", name="implies")
 
         if allow_true_and_false:
             self.add_bool(True)
@@ -120,6 +124,14 @@ class Symbols:
         self.replacements = []
         for i in self._symbols:
             self.replacements += i.replacements
+
+    def ascii_key(self):
+        key = "# KEY\n"
+        for s in self._unary:
+            key += "#  " + s.ascii + " " + s.name + "\n"
+        for s in self._binary:
+            key += "#  " + s.ascii + " " + s.name + "\n"
+        key += "#  a-z represent variables"
 
     def next(self, prev, current):
         follow = self.follow(prev)
