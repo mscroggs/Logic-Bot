@@ -18,8 +18,8 @@ jobs:
           command: python3 -m flake8 logic --exclude=__init__.py
           name: Flake8 checks on logic
       - run:
-          command: python3 -m flake8 test
-          name: Flake8 checks on tests
+          command: python3 -m flake8 test scripts
+          name: Flake8 checks on everything else
       - run:
           command: pip3 install . --user -v
           name: Install
@@ -28,7 +28,8 @@ jobs:
           name: Run tests
       - run:
           command: cd scripts && mkdir script_output &&
-                   python3 contradictions.py -n 8 -f script_output/contradictions
+                   python3 contradictions.py -n 8 -f script_output/contradictions &&
+                   python3 tautologies.py -n 8 -f script_output/tautologies
           name: Run Scripts
 
 
