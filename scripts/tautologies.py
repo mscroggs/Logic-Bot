@@ -5,7 +5,14 @@ f.next()
 
 if len(sys.argv)>=2:
     with open(sys.argv[1],"w") as file:
-        file.write("# KEY\n#  - not\n#  + and\n#  / o\n#  > implies\n#  = if and only if\n#  a-z and A-J represent variables\n")
+        file.write("# KEY
+\n#  - not
+\n#  + and
+\n#  / o
+\n#  > implies
+\n#  = if and only if
+\n#  a-z and A-J represent variables
+\n")
 
 count = 0
 leng = 1

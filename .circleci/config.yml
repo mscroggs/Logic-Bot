@@ -31,13 +31,12 @@ jobs:
 commands:
   run-scripts:
     description: Run scripts
+    name: Run scripts
     steps:
       - run:
           command: mkdir script_output
-          name: Make folder
       - run:
           command: python3 scripts/contradictions.py -n 8 -f script_output/contradictions
-          name: contradictions.py
 
 workflows:
   main:
