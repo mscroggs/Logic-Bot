@@ -33,10 +33,8 @@ commands:
     description: Run scripts
     name: Run scripts
     steps:
-      - run:
-          command: mkdir script_output
-      - run:
-          command: python3 scripts/contradictions.py -n 8 -f script_output/contradictions
+      - run: mkdir script_output
+      - run: python3 scripts/contradictions.py -n 8 -f script_output/contradictions
 
 workflows:
   main:
