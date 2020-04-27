@@ -122,6 +122,10 @@ class Symbols:
         if "include_bools" in params and params["include_bools"]:
             self.add_bool(True)
             self.add_bool(False)
+        if "allow_not_bool" in params:
+            self.allow_not_bool = params["allow_not_not"]
+        else:
+            self.allow_not_bool = True
         if "allow_not_not" in params:
             self.allow_not_not = params["allow_not_not"]
         else:
@@ -171,12 +175,14 @@ class Symbols:
         # If last character is a unary symbol
         if isinstance(prev[-1], UnarySymbol):
             if self.allow_not_not:
-                return (self._unary + self._bool + [self._open]
+                u = self._unary
+            else:
+                u = [i for i in self._unary if i != prev[-1]]
+            if self.allow_not_bool:
+                return (u + self._bool + [self._open]
                         + self.variables_follow(prev))
             else:
-                return ([i for i in self._unary if i != prev[-1]]
-                        + self._bool + [self._open]
-                        + self.variables_follow(prev))
+                return u + [self._open] + self.variables_follow(prev)
         # If the last character is a variable, bool or )
         assert (isinstance(prev[-1], Bool) or isinstance(prev[-1], Variable)
                 or prev[-1] == self._close)

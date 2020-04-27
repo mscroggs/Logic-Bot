@@ -85,7 +85,7 @@ class Formula:
         return "".join([i.ascii for i in self._list])
 
     def as_tex(self):
-        return "".join([i.tex for i in self._list])
+        return " ".join([i.tex for i in self._list])
 
     def as_unicode(self):
         return "".join([i.unicode for i in self._list])
