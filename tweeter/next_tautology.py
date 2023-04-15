@@ -2,13 +2,14 @@ from logic import FormulaFactory
 
 
 def tweet(status):
-    import twitter
+    from pytwitter import Api
     import config
-    tau = twitter.Twitter(
-        auth=twitter.OAuth(config.access_key, config.access_secret,
-                           config.consumer_key, config.consumer_secret))
-    tau.statuses.update(status=status)
-
+    try:
+        tau = Api(access_token=config.access_key, access_secret=config.access_secret,
+                  consumer_key=config.consumer_key, consumer_secret=config.consumer_secret)
+        tau.create_tweet(text=status)
+    except:
+        pass
 
 def toot(status):
     from mastodon import Mastodon
